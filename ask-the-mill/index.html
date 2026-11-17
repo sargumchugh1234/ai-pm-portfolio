@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ask the Mill</title>
+<style>
+[hidden]{display:none!important}
+body{margin:0}
+/* Layout: plain product screen — app bar, chat panel, details sidebar; stacks on phones */
+:root{
+  --bg:#F6F7F9; --panel:#FFFFFF; --ink:#1F2328; --muted:#636C76; --line:#E1E4E8;
+  --accent:#0B63CE; --accent-soft:#EAF2FC; --user:#EAF2FC;
+  --good:#1A7F37; --warn:#9A6700; --bad:#CF222E;
+  --body:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1117; --panel:#161B22; --ink:#E6EDF3; --muted:#8D96A0; --line:#30363D;
+  --accent:#4493F8; --accent-soft:#132339; --user:#132339;
+  --good:#3FB950; --warn:#D29922; --bad:#F85149; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1117; --panel:#161B22; --ink:#E6EDF3; --muted:#8D96A0; --line:#30363D;
+  --accent:#4493F8; --accent-soft:#132339; --user:#132339;
+  --good:#3FB950; --warn:#D29922; --bad:#F85149; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 16px}
+h1{font-size:18px;font-weight:600;margin:0}
+.sub{color:var(--muted);margin:2px 0 0;font-size:13px;max-width:70ch}
+.meta{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:12px;padding:2px 8px;border:1px solid var(--line);border-radius:4px;color:var(--muted);white-space:nowrap}
+.pill.sample{color:var(--warn);border-color:var(--warn)}
+.grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.chat{background:var(--panel);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;min-height:540px}
+.log{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;max-height:600px}
+.msg{max-width:92%;min-width:0}
+.msg.user{align-self:flex-end;background:var(--user);color:var(--ink);padding:8px 12px;border-radius:6px}
+.msg.bot{align-self:flex-start;padding:2px 0}
+.msg.bot p{margin:0 0 8px}.msg.bot p:last-child{margin:0}
+.who{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:2px}
+.tbl{overflow-x:auto;margin:8px 0;border:1px solid var(--line);border-radius:4px}
+table{border-collapse:collapse;font-size:13px;width:100%;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+th{font-weight:600;font-size:12px;color:var(--muted);background:var(--bg)}
+td.num,th.num{text-align:right}
+.bars{display:flex;align-items:flex-end;gap:8px;height:100px;margin:10px 0 4px;padding-top:16px;max-width:420px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;min-width:0}
+.bar i{display:block;width:100%;background:var(--muted);opacity:.45;border-radius:2px 2px 0 0}
+.bar i.hi{background:var(--accent);opacity:1}
+.bar b{font-weight:500;font-size:11px;color:var(--muted)}
+.bar span{font-size:11px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;border-top:1px solid var(--line)}
+.chip{font:inherit;font-size:13px;padding:4px 10px;border-radius:4px;border:1px solid var(--line);background:var(--panel);color:var(--accent);cursor:pointer}
+.chip:hover{background:var(--accent-soft)}
+.chip:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+form{display:flex;gap:8px;padding:10px 16px 16px}
+input{flex:1;min-width:0;font:inherit;padding:8px 10px;border-radius:4px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.send{font:inherit;font-weight:600;padding:0 16px;border-radius:4px;border:0;background:var(--accent);color:#fff;cursor:pointer}
+.trace{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:14px}
+.trace h2{font-size:14px;font-weight:600;margin:0}
+.trace .hint{color:var(--muted);font-size:12px;margin:-10px 0 0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.meter{display:flex;flex-direction:column;gap:4px}
+.meter .row{display:flex;justify-content:space-between;font-size:13px}
+.meter .row b{font-weight:600;font-variant-numeric:tabular-nums}
+.track{height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.fill{height:100%;transition:width .3s ease}
+.status{font-size:12px;padding:3px 8px;border-radius:4px;display:inline-block}
+.layers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;counter-reset:l}
+.layers li{counter-increment:l;font-size:13px;color:var(--muted)}
+.layers li::before{content:counter(l) ". ";}
+.layers li.on{color:var(--ink)}
+.layers li.on::after{content:" ✓";color:var(--good)}
+footer{color:var(--muted);font-size:12px;max-width:80ch}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Ask the Mill</h1>
+      <p class="sub">A conversational search agent for paper mill teams. Ask about trim waste, order status, fulfilment or production, and see how the agent reached its answer.</p>
+    </div>
+    <div class="meta">
+      <span class="pill sample">Sample data</span>
+      <span class="pill">Sunrise Kraft Mill · PM1 + PM2</span>
+      <span class="pill">Week of 9 Nov 2026</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="chat" aria-label="Conversation">
+      <div class="log" id="log" aria-live="polite"></div>
+      <div class="chips" id="chips"></div>
+      <form id="form">
+        <label for="q" class="sr" hidden>Ask a question</label>
+        <input id="q" autocomplete="off" placeholder="e.g. Why did trim waste go up this week?">
+        <button class="send" type="submit">Ask</button>
+      </form>
+    </section>
+
+    <aside class="trace" aria-label="Answer details">
+      <h2>Answer details</h2>
+      <p class="hint">Every answer passes through the same pipeline. Low confidence means the agent asks instead of guessing.</p>
+      <div class="meter"><div class="row"><span>Intent confidence</span><b id="ic">–</b></div><div class="track"><div class="fill" id="icb" style="width:0"></div></div></div>
+      <div class="meter"><div class="row"><span>Data confidence</span><b id="dc">–</b></div><div class="track"><div class="fill" id="dcb" style="width:0"></div></div></div>
+      <div><span class="status" id="decision">Waiting for a question</span></div>
+      <dl class="kv">
+        <dt>Intent</dt><dd id="t-intent">–</dd>
+        <dt>Entities</dt><dd id="t-ent">–</dd>
+        <dt>Source</dt><dd id="t-src">–</dd>
+      </dl>
+      <div>
+        <div class="who" style="margin-bottom:6px">Steps run</div>
+        <ol class="layers" id="layers">
+          <li>Understand the question</li>
+          <li>Classify intent</li>
+          <li>Extract entities (GSM, machine, customer, dates)</li>
+          <li>Score intent confidence</li>
+          <li>Retrieve mill data</li>
+          <li>Score data confidence</li>
+          <li>Answer, or ask to clarify</li>
+          <li>Cite the source</li>
+        </ol>
+      </div>
+    </aside>
+  </div>
+
+  <footer>Portfolio demo by Sargam Chugh, based on the Search and Knowledge agent she led for Kaiznn. All mill names, customers and figures here are invented sample data. This demo uses rule-based intent matching so it runs anywhere; the production agent uses an LLM with retrieval.</footer>
+</div>
+
+<script>
+const D = {
+  days:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+  trimThis:[3.1,3.4,4.8,5.2,4.6,3.3,3.0], trimLast:[3.0,3.2,3.1,3.0,3.3,3.1,2.9],
+  machines:{
+    PM1:{plan:420,actual:398,reels:182,trim:3.4,down:"6.5 h (felt change, Thu)"},
+    PM2:{plan:360,actual:371,reels:164,trim:4.5,down:"1.0 h"}
+  },
+  orders:[
+    {po:"AC-2291",cust:"Apex Cartons",gsm:120,bf:18,w:1450,ord:60,disp:60,due:"10 Nov"},
+    {po:"BL-0874",cust:"BlueLine Packaging",gsm:80,bf:16,w:1180,ord:45,disp:20,due:"14 Nov"},
+    {po:"SC-3310",cust:"Shree Corrugators",gsm:100,bf:20,w:1600,ord:80,disp:52,due:"15 Nov"},
+    {po:"NB-1022",cust:"Nova Boxes",gsm:80,bf:16,w:960,ord:30,disp:0,due:"16 Nov"},
+    {po:"MP-5541",cust:"Metro Pack",gsm:140,bf:22,w:1300,ord:55,disp:55,due:"11 Nov"},
+    {po:"AC-2305",cust:"Apex Cartons",gsm:100,bf:18,w:1220,ord:40,disp:12,due:"18 Nov"},
+    {po:"SC-3326",cust:"Shree Corrugators",gsm:120,bf:20,w:1500,ord:70,disp:70,due:"12 Nov"},
+    {po:"BL-0880",cust:"BlueLine Packaging",gsm:80,bf:16,w:1050,ord:35,disp:0,due:"19 Nov"}
+  ]
+};
+const customers=[...new Set(D.orders.map(o=>o.cust))];
+const INTENTS={
+  trim:{label:"Trim waste analysis",words:["trim","waste","loss","wastage","side trim"],src:"Deckle plans + production log"},
+  orders:{label:"Order status and pending quantity",words:["order","orders","pending","status","dispatch","dispatched"," po ","balance","due"],src:"Order book"},
+  fulfil:{label:"Fulfilment against plan",words:["fulfil","fulfill","fulfilment","fulfillment","plan","target","achieved","vs plan","on time"],src:"Weekly production plan + actuals"},
+  prod:{label:"Machine and reel production",words:["production","produce","produced","reel","reels","machine","tons","tonnes","output","pm1","pm2","downtime"],src:"Production log"}
+};
+const SUGGEST=["Why did trim waste go up this week?","Which orders are still pending?","How did we do against plan?","How many reels did PM2 make?","What's pending for BlueLine?"];
+
+const $=id=>document.getElementById(id);
+const log=$("log");
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function add(role,html){const d=document.createElement("div");d.className="msg "+role;d.innerHTML=(role==="bot"?'<div class="who">Assistant</div>':"")+html;log.appendChild(d);log.scrollTop=log.scrollHeight}
+
+function entities(q){
+  const e={};const s=q.toLowerCase();
+  const m=s.match(/pm\s?([12])/);if(m)e.machine="PM"+m[1];
+  const g=s.match(/(\d{2,3})\s?gsm/);if(g)e.gsm=+g[1];
+  const c=customers.find(c=>s.includes(c.toLowerCase().split(" ")[0]));if(c)e.customer=c;
+  if(/last week/.test(s))e.period="last week";else if(/this week|today|week/.test(s))e.period="this week";
+  return e;
+}
+function classify(q){
+  const s=" "+q.toLowerCase()+" ";const scores={};
+  for(const[k,v]of Object.entries(INTENTS)){scores[k]=v.words.reduce((n,w)=>n+(s.includes(w)?1:0),0)}
+  const ranked=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const [top,ts]=ranked[0],[, second]=ranked[1];
+  let conf=ts===0?0.12:Math.min(0.97,0.55+0.18*ts-0.15*second);
+  return {top,conf:Math.max(0.12,conf),runner:ranked[1][0],scores};
+}
+function pct(x){return Math.round(x*100)+"%"}
+function setMeter(id,v){$(id).textContent=pct(v);const b=$(id+"b");b.style.width=pct(v);b.style.background=v>=.7?"var(--good)":v>=.45?"var(--warn)":"var(--bad)"}
+function trace(intent,ic,dc,ent,decision,kind,stop){
+  setMeter("ic",ic);setMeter("dc",dc);
+  $("t-intent").textContent=intent?INTENTS[intent].label:"No match";
+  const es=Object.entries(ent).map(([k,v])=>k+": "+v);$("t-ent").textContent=es.length?es.join(" · "):"None found";
+  $("t-src").textContent=intent&&kind==="answer"?INTENTS[intent].src:"–";
+  const st=$("decision");st.textContent=decision;
+  const col=kind==="answer"?"--good":kind==="clarify"?"--warn":"--bad";
+  st.style.color=`var(${col})`;st.style.border=`1px solid var(${col})`;
+  [...$("layers").children].forEach((li,i)=>li.classList.toggle("on",i<stop));
+}
+function bars(vals,labels,hiFrom){
+  const max=Math.max(...vals);
+  return '<div class="bars">'+vals.map((v,i)=>`<div class="bar"><b>${v.toFixed(1)}</b><i class="${v>=hiFrom?"hi":""}" style="height:${(v/max*100).toFixed(0)}%"></i><span>${labels[i]}</span></div>`).join("")+"</div>";
+}
+const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+
+const ANSWER={
+  trim(e){
+    if(e.machine){const m=D.machines[e.machine];return `<p><b>${e.machine}</b> averaged <b>${m.trim}% trim</b> this week, against a mill average of ${avg(D.trimThis).toFixed(1)}%.</p><p>${e.machine==="PM2"?"PM2 carried most of the increase. It ran three narrow 80 GSM orders (960, 1,050 and 1,180 mm) that left wide side trim when combined on the reel.":"PM1 stayed close to its normal range. The increase came mainly from PM2."}</p>`}
+    return `<p>Trim waste averaged <b>${avg(D.trimThis).toFixed(1)}%</b> this week, up from ${avg(D.trimLast).toFixed(1)}% last week. The spike ran Wednesday to Friday.</p>${bars(D.trimThis,D.days,4.5)}<p><b>Likely cause:</b> PM2 ran three narrow 80 GSM orders for BlueLine and Nova Boxes. Their widths combined poorly on the reel and left wide side trim.</p><p><b>Suggested action:</b> hold narrow 80 GSM orders until there are enough to combine, or pair them with 1,600 mm Shree Corrugators orders.</p>`;
+  },
+  orders(e){
+    let rows=D.orders.filter(o=>o.ord-o.disp>0);
+    if(e.customer)rows=D.orders.filter(o=>o.cust===e.customer);
+    if(e.gsm)rows=rows.filter(o=>o.gsm===e.gsm);
+    if(!rows.length)return `<p>No pending orders match that. Everything for ${e.customer||"that filter"} is fully dispatched.</p>`;
+    const pend=rows.reduce((n,o)=>n+o.ord-o.disp,0);
+    return `<p>${e.customer?`<b>${e.customer}</b> has`:"There are"} <b>${rows.filter(o=>o.ord>o.disp).length} open orders</b> with <b>${pend} t pending</b>.</p><div class="tbl"><table><tr><th>PO</th><th>Customer</th><th class="num">GSM</th><th class="num">Width mm</th><th class="num">Pending t</th><th>Due</th></tr>${rows.map(o=>`<tr><td>${o.po}</td><td>${o.cust}</td><td class="num">${o.gsm}</td><td class="num">${o.w.toLocaleString("en-IN")}</td><td class="num">${o.ord-o.disp}</td><td>${o.due}</td></tr>`).join("")}</table></div>${!e.customer?"<p>Nova Boxes NB-1022 is due 16 Nov with nothing dispatched yet, so it is the one to watch.</p>":""}`;
+  },
+  fulfil(e){
+    const ms=e.machine?[e.machine]:["PM1","PM2"];
+    const P=ms.reduce((n,k)=>n+D.machines[k].plan,0),A=ms.reduce((n,k)=>n+D.machines[k].actual,0);
+    return `<p>${e.machine?e.machine:"The mill"} made <b>${A} t</b> against a plan of ${P} t, which is <b>${(A/P*100).toFixed(1)}% of plan</b>.</p><div class="tbl"><table><tr><th>Machine</th><th class="num">Plan t</th><th class="num">Actual t</th><th class="num">% of plan</th></tr>${ms.map(k=>{const m=D.machines[k];return `<tr><td>${k}</td><td class="num">${m.plan}</td><td class="num">${m.actual}</td><td class="num">${(m.actual/m.plan*100).toFixed(1)}%</td></tr>`}).join("")}</table></div>${ms.includes("PM1")?"<p>PM1 fell 22 t short, mostly due to 6.5 hours of downtime for a felt change on Thursday.</p>":""}`;
+  },
+  prod(e){
+    const ms=e.machine?[e.machine]:["PM1","PM2"];
+    return `<div class="tbl"><table><tr><th>Machine</th><th class="num">Reels</th><th class="num">Tons</th><th>Downtime</th></tr>${ms.map(k=>{const m=D.machines[k];return `<tr><td>${k}</td><td class="num">${m.reels}</td><td class="num">${m.actual}</td><td>${m.down}</td></tr>`}).join("")}</table></div><p>${e.machine?`${e.machine} made <b>${D.machines[e.machine].reels} reels</b> this week.`:`Together the machines made <b>${D.machines.PM1.reels+D.machines.PM2.reels} reels</b> and <b>${D.machines.PM1.actual+D.machines.PM2.actual} t</b> this week.`}</p>`;
+  }
+};
+
+function ask(q){
+  q=q.trim();if(!q)return;
+  add("user",esc(q));
+  const e=entities(q);const c=classify(q);
+  let intent=c.top;let ic=c.conf;
+  if(e.customer&&c.scores.orders===0&&ic<.6){intent="orders";ic=.72}
+  if(e.machine&&ic<.45){intent="prod";ic=.6}
+  if(ic<.3){
+    add("bot",`<p>I can only answer questions about this mill's data, and I couldn't match that to one. Try asking about trim waste, pending orders, fulfilment against plan, or machine production.</p>`);
+    trace(null,ic,0,e,"Out of scope: declined","decline",4);return;
+  }
+  if(ic<.6){
+    add("bot",`<p>I want to get this right. Did you mean <b>${INTENTS[intent].label.toLowerCase()}</b> or <b>${INTENTS[c.runner].label.toLowerCase()}</b>?</p>`);
+    trace(intent,ic,.5,e,"Low confidence: asked to clarify","clarify",7);
+    showChips([INTENTS[intent].label,INTENTS[c.runner].label].map(l=>l.replace(" and pending quantity","")));return;
+  }
+  const dc=e.period==="last week"&&intent!=="trim"?.55:(e.customer||e.machine||e.gsm?.93:.88);
+  add("bot",ANSWER[intent](e)+(e.period==="last week"&&intent!=="trim"?"<p><i>Sample data only covers this week, so this answer shows this week's figures.</i></p>":""));
+  trace(intent,ic,dc,e,"Confident: answered with source","answer",8);
+  showChips(SUGGEST);
+}
+function showChips(list){const c=$("chips");c.innerHTML="";list.forEach(t=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=t;b.onclick=()=>ask(t);c.appendChild(b)})}
+$("form").addEventListener("submit",ev=>{ev.preventDefault();const v=$("q").value;$("q").value="";ask(v)});
+add("bot","<p>Hi, I answer questions from Sunrise Kraft Mill's planning and production data. Pick a question below or type your own.</p>");
+ask("Why did trim waste go up this week?");
+</script>
+
+</body>
+</html>
