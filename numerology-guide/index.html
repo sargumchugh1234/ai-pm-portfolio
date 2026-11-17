@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mysstical Numbers</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap">
+<style>
+[hidden]{display:none!important}
+body{margin:0}
+/* Layout: one brand column — tabs for My numbers, Compatibility, Ask; results as plain panels with the 3x3 Vedic grid as the centrepiece */
+:root{
+  --bg:#211B2E; --panel:#2A2339; --raise:#352C47; --ink:#F1ECF8; --muted:#B3A8C6; --line:#43385A;
+  --violet:#9F76FF; --violet-soft:#3B2F5C; --good:#7FD1A0; --mid:#E9C46A; --hard:#F09A9A;
+  --script:"Pacifico", "Brush Script MT", cursive;
+  --body:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.head h1{margin:0;font-size:22px;font-weight:600}
+.head p{margin:2px 0 0;color:var(--muted);font-size:13px;max-width:52ch}
+.brand{text-align:right;line-height:1.1}.brand .w{font-family:var(--script);color:var(--violet);font-size:18px}.brand .by{font-size:9px;letter-spacing:.18em;color:var(--violet)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tab{font:inherit;background:none;border:0;color:var(--muted);padding:8px 12px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--violet)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:150px}
+label{font-size:12px;color:var(--muted)}
+input,select{font:inherit;padding:9px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--ink);min-width:0}
+.btn{font:inherit;font-weight:600;padding:9px 16px;border:0;border-radius:6px;background:var(--violet);color:#1A1424;cursor:pointer}
+.btn:focus-visible,.tab:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.nums{grid-template-columns:1fr}}
+.num{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px}
+.num .k{font-size:12px;color:var(--muted)}
+.num .v{font-size:30px;font-weight:600;line-height:1.2}
+.num .p{font-size:13px;color:var(--violet)}
+h3{margin:0;font-size:15px;font-weight:600}
+.split{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:560px){.split{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:repeat(3,72px);grid-template-rows:repeat(3,72px);border:1px solid var(--violet);border-radius:6px;overflow:hidden}
+.cell{border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);position:relative}
+.cell .d{font-size:20px;font-weight:600;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.cell .pl{font-size:10px;color:var(--muted)}
+.cell.empty .d{color:var(--line)}
+.cell.multi{background:var(--violet-soft)}
+ul.plain{margin:0;padding-left:18px}ul.plain li{margin:2px 0}
+.note{font-size:12px;color:var(--muted)}
+.pill{display:inline-block;font-size:12px;padding:1px 8px;border-radius:4px;border:1px solid currentColor}
+.f{color:var(--good)}.n{color:var(--mid)}.e{color:var(--hard)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+th{font-size:12px;color:var(--muted);font-weight:500}
+.tblw{overflow-x:auto}
+.log{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto}
+.m{max-width:88%;padding:8px 12px;border-radius:10px}
+.m.u{align-self:flex-end;background:var(--violet);color:#1A1424}
+.m.t{align-self:flex-start;background:var(--raise)}
+.m p{margin:0 0 6px}.m p:last-child{margin:0}
+.flag{display:inline-block;font-size:11px;color:var(--mid);border:1px solid var(--mid);border-radius:4px;padding:0 6px;margin-bottom:4px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:inherit;font-size:13px;padding:5px 10px;border-radius:999px;border:1px solid var(--violet);background:transparent;color:var(--ink);cursor:pointer}
+.foot{font-size:12px;color:var(--muted)}
+#out-me,#out-co{display:flex;flex-direction:column;gap:14px}
+.callout{border-left:3px solid var(--violet);padding:6px 10px;background:var(--bg);font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>Numerology guide</h1>
+      <p>Find your Mulank, Bhagyank and name number, see your Vedic grid, check compatibility, or ask a quick question.</p>
+    </div>
+    <div class="brand"><div class="w">Mysstical Tarot</div><div class="by">BY SARGUM</div></div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-me" aria-selected="true" data-p="p-me">My numbers</button>
+    <button class="tab" role="tab" id="t-co" aria-selected="false" data-p="p-co">Compatibility</button>
+    <button class="tab" role="tab" id="t-ask" aria-selected="false" data-p="p-ask">Ask</button>
+  </div>
+
+  <section class="panel" id="p-me" role="tabpanel">
+    <form class="row" id="f-me">
+      <div class="field"><label for="nm">Full name</label><input id="nm" value="Aanya Sharma" autocomplete="off"></div>
+      <div class="field"><label for="dob">Date of birth</label><input id="dob" type="date" value="1996-08-23"></div>
+      <button class="btn" type="submit">Calculate</button>
+    </form>
+    <p class="note">Example values are filled in. Your details are worked out in your browser and not saved anywhere.</p>
+    <div id="out-me"></div>
+  </section>
+
+  <section class="panel" id="p-co" role="tabpanel" hidden>
+    <form class="row" id="f-co">
+      <div class="field"><label for="d1">Your date of birth</label><input id="d1" type="date" value="1996-08-23"></div>
+      <div class="field"><label for="d2">Their date of birth</label><input id="d2" type="date" value="1994-03-14"></div>
+      <div class="field" style="flex:0 1 160px"><label for="rel">Relationship</label><select id="rel"><option>Partner</option><option>Friend</option><option>Business partner</option><option>Family</option></select></div>
+      <button class="btn" type="submit">Check</button>
+    </form>
+    <div id="out-co"></div>
+  </section>
+
+  <section class="panel" id="p-ask" role="tabpanel" hidden>
+    <div class="log" id="log" aria-live="polite"></div>
+    <div class="chips" id="chips"></div>
+    <form class="row" id="f-ask"><div class="field"><label for="q">Your question</label><input id="q" autocomplete="off" placeholder="e.g. What does number 7 mean?"></div><button class="btn" type="submit">Ask</button></form>
+  </section>
+
+  <p class="foot">Portfolio prototype by Sargam Chugh. Uses the Vedic system: Mulank from the birth day, Bhagyank from the full date, name number from the Chaldean chart, and the 3-1-9 / 6-7-5 / 2-8-4 Vedic grid. Methods vary between numerologists; this version follows common published conventions until Sargum's own teaching replaces them. Numerology is for reflection and guidance, not medical, legal or financial advice.</p>
+</div>
+
+<script>
+/* ---------- Knowledge base: Sargum will replace these with her own content ---------- */
+const KB={
+ planets:{1:"Sun",2:"Moon",3:"Jupiter",4:"Rahu",5:"Mercury",6:"Venus",7:"Ketu",8:"Saturn",9:"Mars"},
+ days:{1:"Sunday",2:"Monday",3:"Thursday",4:"Saturday",5:"Wednesday",6:"Friday",7:"Tuesday",8:"Saturday",9:"Tuesday"},
+ traits:{
+  1:{s:"Natural leader, independent, driven and confident. Likes to start things and be seen.",w:"Can be stubborn or proud, and finds it hard to take advice."},
+  2:{s:"Sensitive, intuitive and caring. A peacemaker who reads people well.",w:"Moods can swing, and overthinking can lead to self-doubt."},
+  3:{s:"Wise, optimistic and expressive. A natural teacher or guide with strong values.",w:"Can be preachy or spread too thin across too many plans."},
+  4:{s:"Practical, unconventional and hardworking. Thinks differently and questions rules.",w:"Prone to sudden ups and downs and can feel misunderstood."},
+  5:{s:"Quick-thinking, witty and adaptable. Great communicator who loves variety.",w:"Restless, can get bored fast and take on too much."},
+  6:{s:"Loving, artistic and responsible. Values beauty, comfort and harmony at home.",w:"Can be over-giving, or get too attached to comfort and approval."},
+  7:{s:"Deep, intuitive and spiritual. Analytical and drawn to research and inner work.",w:"Can withdraw, feel detached or doubt the outcome of their efforts."},
+  8:{s:"Disciplined, patient and serious about goals. Builds slowly but lasts.",w:"Results can come late, and they may carry too much responsibility alone."},
+  9:{s:"Courageous, energetic and passionate. Protective and quick to act.",w:"Short temper and impatience, and can rush into conflict."}
+ },
+ missing:{
+  1:"Practise speaking up and taking visible ownership of small decisions.",
+  2:"Build emotional routines: journaling, regular rest, and time with people who calm you.",
+  3:"Make learning a habit and seek a mentor. Write down plans before acting.",
+  4:"Create structure: fixed routines, budgets and checklists.",
+  5:"Practise clear communication and keep track of money and paperwork.",
+  6:"Make space for relationships, home and creativity, not only work.",
+  7:"Spend some quiet time alone. Meditation or reflection helps trust your intuition.",
+  8:"Be patient with results and finish what you start. Consistency is the remedy.",
+  9:"Move your body regularly and channel energy into goals instead of frustration."
+ },
+ /* Relationship table based on traditional planetary friendships. Sargum's own table will replace this. */
+ rel:{
+  1:{f:[2,3,9],n:[5],e:[4,6,7,8]},
+  2:{f:[1,5],n:[3,6,8,9],e:[4,7]},
+  3:{f:[1,2,9],n:[4,7,8],e:[5,6]},
+  4:{f:[5,6,8],n:[3,7],e:[1,2,9]},
+  5:{f:[1,4,6],n:[3,7,8,9],e:[2]},
+  6:{f:[4,5,8],n:[3,7,9],e:[1,2]},
+  7:{f:[3,9],n:[5,6,8],e:[1,2]},
+  8:{f:[4,5,6],n:[3,7],e:[1,2,9]},
+  9:{f:[1,2,3],n:[6,7,8],e:[4,5]}
+ },
+ yogas:[
+  {set:[1,2],name:"Raja–Rani",m:"Sun and Moon together: balance between confidence and sensitivity."},
+  {set:[1,5],name:"Budh–Aditya",m:"Sun and Mercury: sharp intellect and good communication."},
+  {set:[2,3],name:"Gaj Kesari",m:"Moon and Jupiter: wisdom, respect and emotional maturity."},
+  {set:[5,6],name:"Laxmi Narayan",m:"Mercury and Venus: supports comfort, creativity and finances."},
+  {set:[3,9],name:"Guru–Mangal",m:"Jupiter and Mars: courage guided by good judgement."},
+  {set:[4,5,6],name:"Golden yoga",m:"Rahu, Mercury and Venus line: strong drive for material growth."}
+ ],
+ chaldean:{A:1,I:1,J:1,Q:1,Y:1,B:2,K:2,R:2,C:3,G:3,L:3,S:3,D:4,M:4,T:4,E:5,H:5,N:5,X:5,U:6,V:6,W:6,O:7,Z:7,F:8,P:8}
+};
+const VEDIC_LAYOUT=[3,1,9,6,7,5,2,8,4];
+/* ---------- Guardrails ---------- */
+const GUARD=[
+ {re:/\b(doctor|medical|disease|illness|sick|cancer|surgery|health|medicine|depress|anxiety|mental)/i,m:"I can't answer health questions, and numbers shouldn't replace a doctor. Please speak to a medical professional."},
+ {re:/\b(pregnan|conceive|baby|gender of)/i,m:"Numerology can't predict pregnancy or a baby's gender. That's a question for a doctor."},
+ {re:/\b(die|death|dying|accident|lifespan|how long .* live)/i,m:"I never predict death, accidents or lifespan. Numerology isn't meant for that."},
+ {re:/\b(lawyer|court|case|legal|visa|divorce)/i,m:"I can't give legal advice. Please talk to a lawyer."},
+ {re:/\b(stock|share|invest|crypto|trading|lottery|betting|gambl|satta|jackpot)/i,m:"I don't give lucky numbers for trading, lottery or betting, and numerology isn't financial advice. Please speak to a financial advisor."},
+ {re:/\b(cursed|curse|unlucky|bad number|doomed|black magic)/i,m:"No number is cursed or bad. Every number has strengths and lessons, and a missing number only points to something to practise."},
+ {re:/\b(should i (marry|leave|break|divorce)|break up|end (the|my) relationship|reject)/i,m:"I won't tell you to marry, leave or reject anyone based on numbers. Compatibility shows patterns to be aware of, not a verdict. A real decision deserves a full conversation with Sargum and with the people involved."},
+ {re:/\b(change my name|name change|new spelling|add a letter)/i,m:"Name corrections are personal and need a full study of your chart. I won't suggest a spelling here. Sargum does this in a consultation."},
+ {re:/\b(guarantee|100%|for sure|definitely)/i,m:"Numerology shows tendencies, not guarantees. Your choices still shape what happens."}
+];
+
+/* ---------- Calculations ---------- */
+const sumDigits=n=>String(n).split("").reduce((a,b)=>a+(+b),0);
+const reduce=n=>{while(n>9)n=sumDigits(n);return n};
+function parse(d){if(!d)return null;const [y,m,dd]=d.split("-").map(Number);if(!y||!m||!dd)return null;return {y,m,d:dd,s:d}}
+function mulank(p){return reduce(p.d)}
+function bhagyank(p){return reduce(sumDigits(p.d)+sumDigits(p.m)+sumDigits(p.y))}
+function nameNumber(name){const letters=name.toUpperCase().replace(/[^A-Z]/g,"");let t=0;for(const c of letters)t+=KB.chaldean[c]||0;return {compound:t,root:t?reduce(t):0}}
+function grid(p){
+ const digits=(String(p.d).padStart(2,"0")+String(p.m).padStart(2,"0")+String(p.y)).split("").map(Number).filter(x=>x>0);
+ const extra=[];const mu=mulank(p);if(p.d>9&&p.d%10!==0)extra.push(mu);extra.push(bhagyank(p));
+ const all=digits.concat(extra);const c={};for(let i=1;i<=9;i++)c[i]=0;all.forEach(x=>c[x]++);
+ return {c,digits,extra};
+}
+function relation(a,b){if(a===b)return "s";const r=KB.rel[a];return r.f.includes(b)?"f":r.e.includes(b)?"e":"n"}
+const REL_LABEL={f:["Friendly","f"],n:["Neutral","n"],e:["Challenging","e"],s:["Same energy","f"]};
+
+/* ---------- Rendering ---------- */
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function renderMe(){
+ const p=parse(document.getElementById("dob").value);const name=document.getElementById("nm").value.trim();const out=document.getElementById("out-me");
+ if(!p){out.innerHTML='<p class="note">Enter a valid date of birth.</p>';return}
+ const mu=mulank(p),bh=bhagyank(p),nn=nameNumber(name),g=grid(p);
+ const cells=VEDIC_LAYOUT.map(n=>{const k=g.c[n];return `<div class="cell ${k?k>1?"multi":"":"empty"}" title="${n} · ${KB.planets[n]}"><div class="d">${k?String(n).repeat(k):n}</div><div class="pl">${KB.planets[n]}</div></div>`}).join("");
+ const missing=Object.keys(g.c).filter(k=>g.c[k]===0).map(Number);
+ const repeated=Object.keys(g.c).filter(k=>g.c[k]>1).map(Number);
+ const present=Object.keys(g.c).filter(k=>g.c[k]>0).map(Number);
+ const yogas=KB.yogas.filter(y=>y.set.every(n=>present.includes(n)));
+ const inner=relation(mu,bh);
+ out.innerHTML=`
+ <div class="nums">
+  <div class="num"><div class="k">Mulank · birth day</div><div class="v">${mu}</div><div class="p">${KB.planets[mu]}</div></div>
+  <div class="num"><div class="k">Bhagyank · full date</div><div class="v">${bh}</div><div class="p">${KB.planets[bh]}</div></div>
+  <div class="num"><div class="k">Name number · Chaldean</div><div class="v">${nn.root||"–"}</div><div class="p">${nn.compound?`${nn.compound} → ${nn.root} · ${KB.planets[nn.root]}`:"Enter a name"}</div></div>
+ </div>
+ <div><h3>Your Mulank ${mu}: ${KB.planets[mu]}</h3><p>${KB.traits[mu].s} <span style="color:var(--muted)">To watch: ${KB.traits[mu].w}</span></p>
+ <p class="note">Favourable day: ${KB.days[mu]}. Mulank and Bhagyank together: <span class="pill ${REL_LABEL[inner][1]}">${REL_LABEL[inner][0]}</span></p></div>
+ <div class="split">
+  <div><h3 style="margin-bottom:8px">Vedic grid</h3><div class="grid" role="img" aria-label="Vedic grid">${cells}</div>
+  <p class="note" style="max-width:216px">Birth date digits without zeros${g.extra.length?`, plus ${g.extra.length===2?"Mulank "+g.extra[0]+" and Bhagyank "+g.extra[1]:"Bhagyank "+g.extra[0]}`:""}.</p></div>
+  <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+   <div><h3>Strong numbers</h3><p>${repeated.length?repeated.map(n=>`${n} (${KB.planets[n]}) appears ${g.c[n]} times, so its qualities are amplified.`).join(" "):"No number repeats, so your energies are fairly evenly spread."}</p></div>
+   <div><h3>Missing numbers</h3>${missing.length?`<ul class="plain">${missing.map(n=>`<li><b>${n} · ${KB.planets[n]}:</b> ${KB.missing[n]}</li>`).join("")}</ul>`:"<p>All nine numbers are present.</p>"}<p class="note">A missing number is not a flaw. It points to a quality you build through practice.</p></div>
+   ${yogas.length?`<div><h3>Combinations in your grid</h3><ul class="plain">${yogas.map(y=>`<li><b>${y.name} (${y.set.join("-")}):</b> ${y.m}</li>`).join("")}</ul></div>`:""}
+  </div>
+ </div>
+ <div class="callout">This is a general overview. For a reading of your full chart, name and timing, book a numerology session with Sargum.</div>`;
+}
+function renderCo(){
+ const a=parse(document.getElementById("d1").value),b=parse(document.getElementById("d2").value);const out=document.getElementById("out-co");
+ if(!a||!b){out.innerHTML='<p class="note">Enter both dates of birth.</p>';return}
+ const A={m:mulank(a),b:bhagyank(a)},B={m:mulank(b),b:bhagyank(b)};
+ const who=document.getElementById("nm").value.trim()||"You";
+ const rows=[["Your Mulank → their Mulank",A.m,B.m],["Your Bhagyank → their Bhagyank",A.b,B.b],["Your Mulank → their Bhagyank",A.m,B.b],["Their Mulank → your Bhagyank",B.m,A.b]];
+ const score={f:2,s:2,n:1,e:0};let tot=0;
+ const tr=rows.map(([l,x,y])=>{const r=relation(x,y);tot+=score[r];return `<tr><td>${l}</td><td>${x} ${KB.planets[x]} · ${y} ${KB.planets[y]}</td><td><span class="pill ${REL_LABEL[r][1]}">${REL_LABEL[r][0]}</span></td></tr>`}).join("");
+ const overall=tot>=6?["Naturally supportive","f","Your core numbers mostly support each other. Things tend to flow, so keep making room for each other's differences."]:tot>=4?["Balanced","n","A mix of easy and growth areas. Most pairs look like this, and it works well with awareness and communication."]:["Growth-focused","e","Your numbers pull in different directions, which means more learning, not a bad match. Clear communication matters more here."];
+ out.innerHTML=`<div class="nums"><div class="num"><div class="k">${esc(who)} · from My numbers</div><div class="v">${A.m} · ${A.b}</div><div class="p">Mulank ${KB.planets[A.m]} · Bhagyank ${KB.planets[A.b]}</div></div><div class="num"><div class="k">Them</div><div class="v">${B.m} · ${B.b}</div><div class="p">Mulank ${KB.planets[B.m]} · Bhagyank ${KB.planets[B.b]}</div></div></div><div class="tblw"><table><tr><th>Pair</th><th>Numbers</th><th>Energy</th></tr>${tr}</table></div>
+ <div><h3>Overall: <span class="pill ${overall[1]}">${overall[0]}</span></h3><p>${overall[2]}</p></div>
+ <div class="callout">Compatibility shows patterns, not a verdict. Never make a decision about a ${esc(document.getElementById("rel").value.toLowerCase())} based on numbers alone.</div>`;
+}
+
+/* ---------- Ask ---------- */
+const log=document.getElementById("log");
+function say(h,w){const d=document.createElement("div");d.className="m "+w;d.innerHTML=h;log.appendChild(d);log.scrollTop=log.scrollHeight}
+function answer(q){
+ for(const g of GUARD)if(g.re.test(q))return `<span class="flag">Boundary</span><p>${g.m}</p>`;
+ const me=parse(document.getElementById("dob").value);
+ if(me&&/\b(my|mine|me)\b/i.test(q)&&/(mulank|bhagyank|number|grid|missing|compatib)/i.test(q)){const mu=mulank(me),bh=bhagyank(me),g=grid(me),miss=Object.keys(g.c).filter(k=>g.c[k]===0);return `<p>From your details in My numbers: <b>Mulank ${mu}</b> (${KB.planets[mu]}) and <b>Bhagyank ${bh}</b> (${KB.planets[bh]}).</p><p>${KB.traits[mu].s}</p><p>Missing in your grid: ${miss.length?miss.join(", "):"none"}. Your Mulank gets on well with ${KB.rel[mu].f.join(", ")}.</p>`}
+ const n=(q.match(/\b([1-9])\b/)||[])[1];
+ if(/mulank|psychic|root number|driver/i.test(q))return "<p><b>Mulank</b> (psychic number) is your birth day reduced to one digit. Born on the 23rd: 2 + 3 = 5. It shows how you see yourself and your natural personality.</p>";
+ if(/bhagyank|destiny|life path|conductor/i.test(q))return "<p><b>Bhagyank</b> (destiny number) is the sum of every digit in your full date of birth, reduced to one digit. For 23-08-1996: 2+3+0+8+1+9+9+6 = 38, 3+8 = 11, 1+1 = 2. It shows the direction your life tends to take.</p>";
+ if(/name number|chaldean|name/i.test(q))return "<p>Your <b>name number</b> uses the Chaldean chart: A I J Q Y = 1, B K R = 2, C G L S = 3, D M T = 4, E H N X = 5, U V W = 6, O Z = 7, F P = 8. No letter is given 9. Add the letters of the name you use and reduce to one digit.</p>";
+ if(/grid|lo shu|chart/i.test(q))return "<p>The <b>Vedic grid</b> is a 3×3 chart: 3 1 9 on top, 6 7 5 in the middle, 2 8 4 at the bottom. Each digit of your birth date (ignoring zeros) goes into its cell, along with your Bhagyank, and your Mulank when your birth day is 11–31 but not 10, 20 or 30. Repeated numbers are amplified, missing ones are qualities to build.</p>";
+ if(n&&/missing/i.test(q))return `<p><b>Missing ${n} (${KB.planets[n]}):</b> ${KB.missing[n]}</p><p class="note">Missing numbers are areas to practise, not flaws.</p>`;
+ if(n&&/compatib|match|friend|enemy|with/i.test(q)){const r=KB.rel[n];return `<p><b>${n} (${KB.planets[n]})</b> usually gets on well with ${r.f.join(", ")}, is neutral with ${r.n.join(", ")}, and finds ${r.e.join(", ")} more challenging.</p><p class="note">Challenging means more growth, not a bad match.</p>`}
+ if(n&&/day|lucky/i.test(q))return `<p>Number ${n} is ruled by ${KB.planets[n]}. Its traditional favourable day is <b>${KB.days[n]}</b>.</p>`;
+ if(n)return `<p><b>${n} · ${KB.planets[n]}.</b> ${KB.traits[n].s}</p><p>To watch: ${KB.traits[n].w}</p>`;
+ if(/master|11|22|33/i.test(q))return "<p>Master numbers like 11, 22 and 33 come from Western numerology. In the Vedic system used here, every number is reduced to a single digit.</p>";
+ return "<p>I can explain any number from 1 to 9, Mulank, Bhagyank, name numbers, the Vedic grid, missing numbers and number compatibility. Try one of the questions below.</p>";
+}
+const CH=["What are my numbers?","What does number 7 mean?","What is Bhagyank?","Missing number 4?","Is 5 compatible with 2?","How is the Vedic grid made?"];
+function chips(){const c=document.getElementById("chips");c.innerHTML="";CH.forEach(t=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=t;b.onclick=()=>ask(t);c.appendChild(b)})}
+function ask(q){q=q.trim();if(!q)return;say(esc(q),"u");say(answer(q),"t")}
+document.getElementById("f-ask").addEventListener("submit",e=>{e.preventDefault();const i=document.getElementById("q");ask(i.value);i.value=""});
+
+/* ---------- Tabs and init ---------- */
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>{x.setAttribute("aria-selected",x===t);document.getElementById(x.dataset.p).hidden=x!==t})}));
+/* One shared profile: My numbers and Compatibility always use the same date of birth */
+const dobEl=document.getElementById("dob"),d1El=document.getElementById("d1"),nmEl=document.getElementById("nm");
+function syncFrom(src){const v=src.value;if(dobEl.value!==v)dobEl.value=v;if(d1El.value!==v)d1El.value=v;renderMe();renderCo()}
+[dobEl,d1El].forEach(el=>{el.addEventListener("input",()=>syncFrom(el));el.addEventListener("change",()=>syncFrom(el))});
+nmEl.addEventListener("input",()=>{renderMe();renderCo()});
+["d2","rel"].forEach(id=>document.getElementById(id).addEventListener("change",renderCo));
+document.getElementById("f-me").addEventListener("submit",e=>{e.preventDefault();syncFrom(dobEl)});
+document.getElementById("f-co").addEventListener("submit",e=>{e.preventDefault();syncFrom(d1El)});
+say("<p>Ask me about any number, your Mulank or Bhagyank, the Vedic grid or compatibility.</p>","t");chips();
+renderMe();renderCo();
+</script>
+
+</body>
+</html>
