@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crystella Guide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap">
+<style>
+[hidden]{display:none!important}
+body{margin:0}
+/* Layout: one chat column in the Crystella brand; suggestions as pickable cards, then a full crystal guide rendered in the conversation */
+:root{
+  --bg:#211B2E; --panel:#2A2339; --raise:#352C47; --ink:#F1ECF8; --muted:#B3A8C6; --line:#43385A;
+  --violet:#9F76FF; --violet-soft:#3B2F5C; --warn:#F2B66D; --ok:#7FD1A0;
+  --script:"Pacifico", "Brush Script MT", cursive;
+  --body:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+.app{max-width:640px;margin:0 auto;height:100%;max-height:900px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.top{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--violet-soft);display:grid;place-items:center;flex:none}
+.top .name{font-weight:600}.top .sub{font-size:12px;color:var(--muted)}
+.brand{margin-left:auto;text-align:right;line-height:1.1}.brand .w{font-family:var(--script);color:var(--violet);font-size:17px}.brand .by{font-size:9px;letter-spacing:.18em;color:var(--violet)}
+.log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.m{max-width:90%;padding:9px 13px;border-radius:12px;min-width:0;overflow-wrap:anywhere}
+.m.t{align-self:flex-start;background:var(--raise);border-bottom-left-radius:4px}
+.m.u{align-self:flex-end;background:var(--violet);color:#1A1424;border-bottom-right-radius:4px}
+.m.wide{max-width:100%;width:100%}
+.m p{margin:0 0 6px}.m p:last-child{margin:0}
+.m a{color:var(--violet);font-weight:600}
+.flag{display:inline-block;font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:4px;padding:0 6px;margin-bottom:6px}
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.opt{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.dot{width:14px;height:14px;border-radius:50%;flex:none;margin-top:4px;border:1px solid rgba(255,255,255,.3)}
+.opt .nm{font-weight:600}.opt .why{font-size:14px;color:var(--muted)}
+.opt button{margin-left:auto;flex:none}
+.pick{font:inherit;font-size:13px;font-weight:600;padding:6px 12px;border-radius:6px;border:0;background:var(--violet);color:#1A1424;cursor:pointer}
+.guide h3{margin:12px 0 4px;font-size:15px}
+.guide h3:first-child{margin-top:0}
+.guide ul{margin:0;padding-left:18px}.guide li{margin:3px 0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px;margin:4px 0}
+.kv dt{color:var(--muted)}.kv dd{margin:0}
+.ok{color:var(--ok)}.no{color:var(--warn)}
+.aff{border-left:3px solid var(--violet);padding:6px 10px;background:var(--bg);font-style:italic}
+.quick{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;border-top:1px solid var(--line)}
+.q{font:inherit;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--violet);background:transparent;color:var(--ink);cursor:pointer}
+.q:hover{background:var(--violet-soft)}
+form{display:flex;gap:8px;padding:0 16px 14px}
+input{flex:1;min-width:0;font:inherit;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.send{font:inherit;font-weight:600;padding:0 16px;border:0;border-radius:8px;background:var(--violet);color:#1A1424;cursor:pointer}
+.q:focus-visible,.send:focus-visible,.pick:focus-visible,input:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.foot{max-width:640px;margin:10px auto 0;font-size:12px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="avatar" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2l5 5-5 15-5-15z" fill="#9F76FF"/><path d="M7 7h10" stroke="#F1ECF8" stroke-width="1.2"/></svg></div>
+    <div><div class="name">Crystella Guide</div><div class="sub">Find your crystal and learn how to use it</div></div>
+    <div class="brand"><div class="w">Crystella</div><div class="by">BY SARGUM</div></div>
+  </div>
+  <div class="log" id="log" aria-live="polite"></div>
+  <div class="quick" id="quick"></div>
+  <form id="f"><label for="in" hidden>Message</label><input id="in" autocomplete="off" placeholder="Tell me what's going on, in your own words"><button class="send" type="submit">Send</button></form>
+</div>
+<p class="foot">Portfolio prototype by Sargam Chugh for Crystella, her crystal line. Crystals are a support for intention and self-care, not a medical treatment.</p>
+
+<script>
+/* ---------- Knowledge base: Sargum will replace with her own content ---------- */
+const FORMS={
+ bracelet:"Bracelet",tumble:"Tumble stone",palm:"Palm stone",tower:"Tower or raw piece",pendant:"Pendant"
+};
+const C={
+ amethyst:{n:"Amethyst",c:"#9B6FD1",ch:"Crown, third eye",hand:"L",water:1,sun:0,salt:1,
+  does:"Calms an overactive mind, eases stress and supports restful sleep and intuition.",
+  tips:{tumble:"Keep it under your pillow or on the bedside table.",palm:"Hold it and take slow breaths when your thoughts race.",tower:"Place it in the bedroom or where you meditate.",pendant:"Wear it close to the chest on stressful days."},
+  aff:"I am calm, clear and at peace.",pair:["Rose Quartz","Lepidolite"]},
+ rose:{n:"Rose Quartz",c:"#F2B5C8",ch:"Heart",hand:"L",water:1,sun:0,salt:1,
+  does:"The stone of love: self-love, compassion, healing old hurts and attracting loving relationships.",
+  tips:{tumble:"Carry it in your purse or keep it on your heart while journaling.",palm:"Hold it over your heart and say your affirmation.",tower:"Place it in the south-west corner of the bedroom, the traditional relationship corner.",pendant:"Wear it at heart level."},
+  aff:"I give and receive love freely.",pair:["Rhodonite","Moonstone"]},
+ citrine:{n:"Citrine",c:"#F4C04E",ch:"Solar plexus",hand:"L",water:1,sun:0,salt:1,
+  does:"Brings optimism, confidence and the energy of abundance. Popular for money, career and new ventures.",
+  tips:{tumble:"Keep one in your wallet or cash box.",palm:"Hold it while you plan goals or before an important call.",tower:"Place it in your workspace or the south-east corner, the traditional wealth corner.",pendant:"Wear it on days you need confidence."},
+  aff:"I welcome abundance and success.",pair:["Pyrite","Green Aventurine"]},
+ tourmaline:{n:"Black Tourmaline",c:"#2B2B33",ch:"Root",hand:"R",water:1,sun:1,salt:1,
+  does:"A protective, grounding stone that helps you feel shielded from negativity and draining energy.",
+  tips:{tumble:"Carry it in a pocket when you're around tense people or places.",palm:"Hold it when you feel overwhelmed and imagine stress draining into the ground.",tower:"Place it near your front door or beside your laptop.",pendant:"Wear it as a protective piece every day."},
+  aff:"I am protected, grounded and safe.",pair:["Smoky Quartz","Hematite"]},
+ quartz:{n:"Clear Quartz",c:"#E8E8F0",ch:"Crown, all chakras",hand:"L",water:1,sun:1,salt:1,
+  does:"The master healer: brings clarity, focus and amplifies intentions and other crystals.",
+  tips:{tumble:"Pair it with another crystal to amplify its intention.",palm:"Hold it while setting goals or meditating.",tower:"Place it on your desk for focus.",pendant:"Wear it daily for clarity."},
+  aff:"My mind is clear and my intentions are strong.",pair:["Any crystal","Amethyst"]},
+ aventurine:{n:"Green Aventurine",c:"#5FB37A",ch:"Heart",hand:"L",water:1,sun:0,salt:1,
+  does:"The stone of opportunity and luck. Supports new beginnings, career growth and calmer emotions.",
+  tips:{tumble:"Carry it to interviews, exams or meetings.",palm:"Hold it while visualising the opportunity you want.",tower:"Place it in your workspace.",pendant:"Wear it when starting something new."},
+  aff:"New opportunities flow to me easily.",pair:["Citrine","Clear Quartz"]},
+ tiger:{n:"Tiger's Eye",c:"#B47A2C",ch:"Solar plexus",hand:"R",water:1,sun:1,salt:1,
+  does:"Builds courage, confidence and willpower. Helps you act instead of overthinking.",
+  tips:{tumble:"Carry it to presentations and difficult conversations.",palm:"Hold it before taking a big decision.",tower:"Place it on your desk.",pendant:"Wear it on days you need to stand your ground."},
+  aff:"I act with courage and confidence.",pair:["Citrine","Carnelian"]},
+ pyrite:{n:"Pyrite",c:"#C9B26B",ch:"Solar plexus",hand:"R",water:0,sun:1,salt:0,
+  does:"Known as fool's gold. Associated with wealth, ambition, discipline and protection at work.",
+  tips:{tumble:"Keep it in your wallet or cash drawer.",palm:"Hold it while writing money goals.",tower:"Place a raw cluster on your work desk or shop counter.",pendant:"Wear it for business days."},
+  aff:"I attract prosperity through focused action.",pair:["Citrine","Tiger's Eye"]},
+ lepidolite:{n:"Lepidolite",c:"#B9A1D9",ch:"Third eye, crown",hand:"L",water:0,sun:0,salt:0,
+  does:"A gentle stone for anxiety, emotional ups and downs, and winding down at night.",
+  tips:{tumble:"Keep it by the bed.",palm:"Hold it during anxious moments and breathe slowly.",tower:"Place it in a calm corner.",pendant:"Wear it on emotionally heavy days."},
+  aff:"I let go of what I can't control.",pair:["Amethyst","Howlite"]},
+ howlite:{n:"Howlite",c:"#EDEDEF",ch:"Crown",hand:"L",water:0,sun:1,salt:0,
+  does:"Soothes anger and restlessness, quiets mental chatter and supports sleep.",
+  tips:{tumble:"Keep it under your pillow.",palm:"Hold it when you feel irritated before you respond.",tower:"Place it in the bedroom.",pendant:"Wear it on busy, stressful days."},
+  aff:"I respond with patience and calm.",pair:["Amethyst","Lepidolite"]},
+ carnelian:{n:"Carnelian",c:"#E0602F",ch:"Sacral",hand:"R",water:1,sun:1,salt:1,
+  does:"Boosts motivation, creativity and drive. Good when you feel stuck or low on energy.",
+  tips:{tumble:"Carry it when you need a push to start.",palm:"Hold it before creative work.",tower:"Place it in your studio or workspace.",pendant:"Wear it on low-energy days."},
+  aff:"I am motivated and creative.",pair:["Tiger's Eye","Citrine"]},
+ moonstone:{n:"Moonstone",c:"#D9DDE8",ch:"Sacral, crown",hand:"L",water:1,sun:0,salt:0,
+  does:"The stone of new beginnings, intuition and emotional balance. Linked with feminine energy and cycles.",
+  tips:{tumble:"Keep it by the bed during the full moon.",palm:"Hold it while journaling about new beginnings.",tower:"Place it on a windowsill that gets moonlight.",pendant:"Wear it close to the body."},
+  aff:"I trust the timing of my life.",pair:["Rose Quartz","Amethyst"]},
+ selenite:{n:"Selenite",c:"#F4F1E8",ch:"Crown",hand:"L",water:0,sun:1,salt:0,
+  does:"Clears and refreshes the energy of a space, and can be used to cleanse other crystals.",
+  tips:{tumble:"Use a small piece in your bag for a calm, clear mind.",palm:"Sweep a selenite wand above your body from head to toe to reset.",tower:"Place a tower or plate in the room, and rest other crystals on it to cleanse them.",pendant:"Wear it with care, as it scratches easily."},
+  aff:"My space and my mind are clear.",pair:["Black Tourmaline","Amethyst"]},
+ smoky:{n:"Smoky Quartz",c:"#7A6A5C",ch:"Root",hand:"R",water:1,sun:0,salt:1,
+  does:"Grounds anxious energy, helps release negativity and old patterns, and steadies you.",
+  tips:{tumble:"Carry it during stressful days.",palm:"Hold it and imagine worries leaving through your feet.",tower:"Place it near the entrance or your workspace.",pendant:"Wear it for grounding."},
+  aff:"I release what no longer serves me.",pair:["Black Tourmaline","Clear Quartz"]},
+ lapis:{n:"Lapis Lazuli",c:"#2E4FA3",ch:"Throat, third eye",hand:"L",water:0,sun:1,salt:0,
+  does:"Supports honest communication, self-expression and wisdom.",
+  tips:{tumble:"Carry it to interviews or difficult talks.",palm:"Hold it before speaking up.",tower:"Place it on your study table.",pendant:"Wear it near the throat."},
+  aff:"I speak my truth clearly and kindly.",pair:["Amazonite","Clear Quartz"]},
+ rhodonite:{n:"Rhodonite",c:"#D9627A",ch:"Heart",hand:"L",water:1,sun:1,salt:1,
+  does:"Helps heal heartbreak, release resentment and practise forgiveness, including of yourself.",
+  tips:{tumble:"Carry it while you work through a breakup or conflict.",palm:"Hold it while writing a letter you don't send.",tower:"Place it in your bedroom.",pendant:"Wear it at heart level."},
+  aff:"I forgive, heal and move forward.",pair:["Rose Quartz","Amethyst"]},
+ hematite:{n:"Hematite",c:"#55565C",ch:"Root",hand:"R",water:0,sun:1,salt:0,
+  does:"Strongly grounding. Helps with focus and a scattered, overthinking mind.",
+  tips:{tumble:"Carry it in a pocket at work.",palm:"Hold it when you feel spaced out or scattered.",tower:"Place it on your desk.",pendant:"Wear it for steadiness."},
+  aff:"I am grounded and focused.",pair:["Black Tourmaline","Fluorite"]},
+ amazonite:{n:"Amazonite",c:"#5CC2B8",ch:"Throat, heart",hand:"L",water:1,sun:0,salt:0,
+  does:"Soothing and balancing. Helps with calm communication and setting boundaries.",
+  tips:{tumble:"Carry it to conversations you're nervous about.",palm:"Hold it to calm down before you reply.",tower:"Place it in a shared space at home.",pendant:"Wear it near the throat."},
+  aff:"I communicate with calm and confidence.",pair:["Lapis Lazuli","Lepidolite"]},
+ fluorite:{n:"Fluorite",c:"#7FA8D9",ch:"Third eye",hand:"L",water:0,sun:0,salt:0,
+  does:"The study stone: sharpens focus, organisation and decision-making.",
+  tips:{tumble:"Keep it on your desk while studying.",palm:"Hold it when you need to make a decision.",tower:"Place it next to your laptop.",pendant:"Wear it during exams or busy workdays."},
+  aff:"My mind is focused and organised.",pair:["Clear Quartz","Hematite"]}
+};
+const CONCERNS=[
+ {k:"stress",l:"Stress or anxiety",re:/stress|anxi|anxious|panic|overwhelm|nervous|tense|worried|worry|restless/i,list:["amethyst","lepidolite","amazonite"]},
+ {k:"sleep",l:"Sleep",re:/sleep|insomnia|nightmare|can'?t rest|awake at night/i,list:["amethyst","lepidolite","howlite"]},
+ {k:"love",l:"Love and self-love",re:/love|partner|relationship|self[- ]?love|soulmate|marriage|romance|attract someone/i,list:["rose","moonstone","rhodonite"]},
+ {k:"heart",l:"Heartbreak",re:/heartbreak|break ?up|breakup|ex\b|betray|hurt|grief|lost someone|forgive/i,list:["rhodonite","rose","lepidolite"]},
+ {k:"confidence",l:"Confidence",re:/confiden|self[- ]?esteem|shy|courage|fear|doubt|insecure|stand up/i,list:["tiger","citrine","carnelian"]},
+ {k:"money",l:"Money and career",re:/money|wealth|financ|salary|business|career|job|promotion|abundance|income|sales|interview/i,list:["citrine","pyrite","aventurine"]},
+ {k:"focus",l:"Focus and studies",re:/focus|study|studies|exam|concentrat|distract|procrastinat|memory|decision/i,list:["fluorite","quartz","hematite"]},
+ {k:"protect",l:"Protection from negativity",re:/negativ|protect|evil eye|nazar|toxic|jealous|bad energy|drain/i,list:["tourmaline","smoky","selenite"]},
+ {k:"ground",l:"Overthinking",re:/overthink|scattered|ground|spaced|unstable|chaos/i,list:["hematite","smoky","tourmaline"]},
+ {k:"anger",l:"Anger",re:/anger|angry|irritat|temper|frustrat/i,list:["howlite","rhodonite","amethyst"]},
+ {k:"comm",l:"Communication",re:/communicat|speak|express|talk|boundar|say no/i,list:["lapis","amazonite","quartz"]},
+ {k:"energy",l:"Motivation",re:/motivat|lazy|stuck|creativ|energy|tired of|low energy|burn ?out/i,list:["carnelian","citrine","tiger"]},
+ {k:"new",l:"New beginnings",re:/new start|new beginning|fresh start|luck|lucky|opportunit|change/i,list:["moonstone","aventurine","quartz"]},
+ {k:"spirit",l:"Intuition",re:/intuition|spiritual|meditat|third eye|manifest/i,list:["amethyst","moonstone","selenite"]}
+];
+/* ---------- Guardrails ---------- */
+const CRISIS=/suicid|kill myself|end my life|want to die|don'?t want to live|self[- ]?harm|hurt myself|cut myself/i;
+const GUARD=[
+ {re:/\b(cure|treat|heal my (disease|cancer|diabetes|bp|thyroid)|instead of (medicine|medication|doctor)|stop (my )?medic)/i,m:"Crystals can't cure or treat any illness, and they should never replace medicine or a doctor's advice. Please keep following your doctor. If you'd like, I can suggest a crystal to support calm and self-care alongside your treatment."},
+ {re:/\b(cancer|diabetes|thyroid|pcos|pcod|tumou?r|infection|fever|blood pressure|migraine|disease)\b/i,m:"That sounds like a health concern, so please speak to a doctor. Crystals are not a medical treatment. I can suggest a crystal for calm and comfort alongside proper care."},
+ {re:/\b(pregnan)/i,m:"For anything related to pregnancy, please follow your doctor's advice. Rose quartz and moonstone are often kept nearby for comfort, but they are not a treatment."},
+ {re:/\b(drink|swallow|eat|elixir|gem water|in (my )?water bottle)\b/i,m:"Please don't drink crystal water or put stones in drinks. Some stones, like malachite and pyrite, can release harmful substances. Keep crystals outside the glass if you like the ritual."},
+ {re:/\b(guarantee|100%|for sure|definitely work|will it make me rich|get my ex back for sure)\b/i,m:"No crystal can guarantee an outcome. Crystals work best as a daily reminder of your intention, alongside the actions you take."},
+ {re:/\b(baby|toddler|kid|child|pet|dog|cat)\b/i,m:"Small tumbles and beads can be a choking hazard, so keep them out of reach of young children and pets."}
+];
+
+/* ---------- Chat engine ---------- */
+const $=id=>document.getElementById(id);const log=$("log");
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function say(h,w="t",wide){const d=document.createElement("div");d.className="m "+w+(wide?" wide":"");d.innerHTML=h;log.appendChild(d);log.scrollTop=log.scrollHeight;return d}
+function quick(list){const q=$("quick");q.innerHTML="";list.forEach(([l,fn])=>{const b=document.createElement("button");b.type="button";b.className="q";b.textContent=l;b.onclick=()=>{say(esc(l),"u");fn()};q.appendChild(b)})}
+const START=()=>quick(CONCERNS.slice(0,8).map(c=>[c.l,()=>suggest([c])]).concat([["Tell me about a crystal",askCrystal]]));
+
+function suggest(found){
+ const seen=new Set();const picks=[];
+ found.forEach(c=>c.list.forEach(k=>{if(!seen.has(k)&&picks.length<3){seen.add(k);picks.push(k)}}));
+ const label=found.map(c=>c.l.toLowerCase()).join(" and ");
+ const d=say(`<p>For ${esc(label)}, these are the crystals I'd suggest:</p><div class="opts">${picks.map(k=>`<div class="opt"><span class="dot" style="background:${C[k].c}"></span><div><div class="nm">${C[k].n}</div><div class="why">${C[k].does}</div></div><button class="pick" type="button" data-k="${k}">Choose</button></div>`).join("")}</div><p style="margin-top:8px">Pick the one that feels right, and I'll give you a full guide to using it.</p>`,"t",true);
+ d.querySelectorAll(".pick").forEach(b=>b.onclick=()=>{say(`I'll go with ${esc(C[b.dataset.k].n)}`,"u");guide(b.dataset.k,label)});
+ quick(picks.map(k=>[C[k].n,()=>guide(k,label)]).concat([["Something else",()=>{say("<p>Tell me a little more about what's going on, in your own words.</p>");START()}]]));
+}
+function guide(k,why){
+ const x=C[k];const handTxt=x.hand==="L"?"<b>Left wrist.</b> The left hand is traditionally the receiving side, so wear stones you want to draw in, like calm, love or abundance, on the left.":"<b>Right wrist.</b> The right hand is traditionally the giving side, so wear stones that protect, release or push you to act on the right.";
+ const methods=[];
+ methods.push('<li><span class="ok">Moonlight:</span> leave it on a windowsill overnight, ideally on a full moon. Safe for every crystal.</li>');
+ methods.push('<li><span class="ok">Smoke:</span> pass it through incense, sage or dhoop smoke for 30 to 60 seconds.</li>');
+ methods.push('<li><span class="ok">Sound:</span> ring a bell or singing bowl near it for 2 to 3 minutes.</li>');
+ if(k!=="selenite")methods.push('<li><span class="ok">Selenite:</span> rest it on a selenite plate for 4 hours or more.</li>');
+ methods.push(x.water?'<li><span class="ok">Water:</span> rinse under cool running water for 30 to 60 seconds, then pat dry.</li>':`<li><span class="no">No water:</span> ${x.n} is water-sensitive and can crack, rust or dissolve. Use moonlight, smoke or sound instead.</li>`);
+ methods.push(x.sun?'<li><span class="ok">Sunlight:</span> 15 to 30 minutes of early morning sun to charge it.</li>':`<li><span class="no">Avoid sun:</span> ${x.n}'s colour can fade in direct sunlight. Charge it in moonlight.</li>`);
+ if(!x.salt)methods.push('<li><span class="no">No salt:</span> salt can scratch or damage this stone.</li>');
+ const order=["bracelet","tumble","palm","tower","pendant"];
+ const formTxt={bracelet:handTxt+" Wear it daily, and take it off while bathing"+(x.water?".":" or swimming, because water can damage it.")};
+ say(`<div class="guide">
+ <h3>Your ${x.n} guide</h3>
+ <p>${x.does}${why?` It's a good match for ${esc(why)}.`:""}</p>
+ <dl class="kv"><dt>Chakra</dt><dd>${x.ch}</dd><dt>Best worn on</dt><dd>${x.hand==="L"?"Left wrist":"Right wrist"}</dd><dt>Pairs well with</dt><dd>${x.pair.join(", ")}</dd></dl>
+ <h3>How to use it, by form</h3>
+ <ul>${order.map(f=>`<li><b>${FORMS[f]}:</b> ${f==="bracelet"?formTxt.bracelet:x.tips[f]}</li>`).join("")}</ul>
+ <h3>Before first use: cleanse and charge</h3>
+ <ul>${methods.join("")}</ul>
+ <p style="margin-top:6px">Cleanse it when it arrives, then about once a week if you wear it daily, or once a month if it sits in a room.</p>
+ <h3>Set your intention</h3>
+ <ol style="margin:0;padding-left:18px"><li>Hold it in both hands and close your eyes.</li><li>Take three slow breaths.</li><li>Say what you want it to support, in one clear sentence.</li><li>Keep it where you'll see or touch it every day.</li></ol>
+ <h3>Daily affirmation</h3>
+ <div class="aff">${x.aff}</div>
+ <h3>Care</h3>
+ <ul><li>Store it separately so harder stones don't scratch it.</li><li>${x.water?"Wipe it with a soft dry cloth.":"Keep it dry and wipe with a soft dry cloth only."}</li><li>Keep small stones away from young children and pets.</li></ul>
+ <p style="margin-top:8px">Want a genuine ${x.n} piece? Ask Sargum about the Crystella collection on <a href="https://mysstical-tarot.vercel.app/contact" target="_blank" rel="noopener">WhatsApp</a>.</p>
+ </div>`,"t",true);
+ quick([["Compare another crystal",START],["How do I wear two bracelets?",()=>reply2("two bracelets")],["Start over",()=>{say("<p>Sure. What would you like help with?</p>");START()}]]);
+}
+function askCrystal(){say("<p>Which crystal? For example amethyst, rose quartz, citrine, pyrite or black tourmaline.</p>");quick(Object.keys(C).slice(0,8).map(k=>[C[k].n,()=>guide(k,"")]))}
+function findCrystal(t){const s=t.toLowerCase();return Object.keys(C).find(k=>{const n=C[k].n.toLowerCase();return s.includes(n)||s.includes(n.split(" ")[0])&&n.split(" ")[0].length>4})}
+function reply2(t){
+ if(/two bracelets|both (hands|wrists)|stack|two crystals/i.test(t)){say("<p>You can wear one on each wrist: a receiving stone on the left (like rose quartz or amethyst) and a protective or action stone on the right (like black tourmaline or tiger's eye). If you stack several on one wrist, keep similar hardness together so softer stones don't get scratched.</p>");START();return}
+ if(/which hand|left or right|wrist/i.test(t)){say("<p>Traditionally the left hand receives and the right hand gives. Wear stones you want to draw in, like love, calm or abundance, on the left. Wear protective or action stones, like black tourmaline, pyrite or tiger's eye, on the right. Choose a crystal and I'll tell you which wrist suits it.</p>");START();return}
+ if(/charge|cleanse|clean|full moon/i.test(t)){say("<p>The safest method for every crystal is moonlight: leave it on a windowsill overnight. Water and sunlight are fine for some stones but can damage others, like selenite, pyrite and lepidolite. Choose a crystal and I'll tell you exactly which methods are safe for it.</p>");START();return}
+ if(/fake|real|genuine|original/i.test(t)){say("<p>Real crystals usually feel cool and heavy for their size, and natural colour is rarely perfectly even. Very bright or very cheap stones are often dyed or glass. Crystella pieces come from Sargum directly, so you can always ask her about a piece.</p>");START();return}
+ say("<p>Tell me a bit more. What's on your mind lately: stress, sleep, love, money, focus, confidence, or something else?</p>");START();
+}
+function reply(text){
+ const t=text.trim();if(!t)return;say(esc(t),"u");
+ if(CRISIS.test(t)){say(`<span class="flag">Your safety first</span><p>I'm really sorry you're feeling this way. You deserve support from a real person right now, not a crystal.</p><p>Please call <b>Tele-MANAS on 14416</b> or <b>1-800-891-4416</b>, India's free mental health helpline, or call <b>112</b> if you're in immediate danger. If you can, reach out to someone you trust and let them know how you're feeling.</p>`);quick([["I'd like to talk about something else",START]]);return}
+ const g=GUARD.find(g=>g.re.test(t));
+ const found=CONCERNS.filter(c=>c.re.test(t));
+ const named=findCrystal(t);
+ if(g){say(`<span class="flag">Boundary</span><p>${g.m}</p>`);if(!found.length&&!named){START();return}}
+ if(named&&!found.length){guide(named,"");return}
+ if(found.length){suggest(found.slice(0,2));return}
+ reply2(t);
+}
+$("f").addEventListener("submit",e=>{e.preventDefault();const v=$("in").value;$("in").value="";reply(v)});
+say("<p>Hi, I'm the Crystella guide ✦</p><p>Tell me what's been going on lately, in your own words, and I'll suggest the crystals that fit. Once you choose one, I'll show you how to wear it, use it, cleanse and charge it.</p>");
+START();
+</script>
+
+</body>
+</html>
