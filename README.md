@@ -10,6 +10,7 @@ I am an Associate Product Manager leading the AI transformation of Kaiznn, an or
 | --- | --- | --- |
 | [Ask the Mill](./ask-the-mill) | Conversational search agent that answers paper mill questions from planning and production data, with intent and data confidence shown for every answer | [Open demo](https://sargumchugh1234.github.io/ai-pm-portfolio/ask-the-mill/) |
 | [Ask Tara](./ask-tara) | Booking assistant for Mysstical Tarot that helps visitors pick a reading, answers FAQs and keeps clear boundaries | [Open demo](https://sargumchugh1234.github.io/ai-pm-portfolio/ask-tara/) |
+| [Crystella Guide](./crystella-guide) | Crystal guide agent: suggests crystals for what someone is going through, then a full guide to wearing, using, cleansing and charging the chosen crystal | [Open demo](https://sargumchugh1234.github.io/ai-pm-portfolio/crystella-guide/) |
 | [Numerology Guide](./numerology-guide) | Vedic numerology agent: Mulank, Bhagyank, Chaldean name number, Vedic grid, compatibility and quick questions | [Open demo](https://sargumchugh1234.github.io/ai-pm-portfolio/numerology-guide/) |
 
 ## How I build AI agents
@@ -28,6 +29,6 @@ All mill, customer and client data in these demos is invented sample data.
 
 ## Contact
 
-- Portfolio: [SARGAM is your PM Buddy](https://app.notion.com/p/c66a21a8cb9342428904381eeeb4735a)
+- Portfolio: [SARGAM is your PM Buddy](https://respected-asphalt-763.notion.site/SARGAM-is-your-PM-Buddy-c66a21a8cb9342428904381eeeb4735a)
 - LinkedIn: [Sargam Chugh](https://www.linkedin.com/in/sargam-chugh-aa0023183/)
 - Email: sargamchugh1234@gmail.com
